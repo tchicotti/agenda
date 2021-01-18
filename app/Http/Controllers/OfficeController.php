@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Office;
+use App\Http\Requests\OfficeRequest;
+use App\Http\Resources\OfficeResource;
 use Illuminate\Http\Request;
-use App\Http\Requests\StatusRequest;
-use App\Http\Resources\StatusResource;
-use App\Status;
 
-class StatusController extends Controller
+class OfficeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,18 +16,18 @@ class StatusController extends Controller
      */
     public function index()
     {
-        return StatusResource::collection(Status::paginate());
+        return OfficeResource::collection(Office::paginate());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  App\Http\Request\StatusRequest  $request
+     * @param  App\Http\Requests\OfficeRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StatusRequest $request)
+    public function store(OfficeRequest $request)
     {
-        $data = Status::create($request->all());
+        $data = Office::create($request->all());
 
         return response()->json([
             'status' => true,
@@ -38,44 +38,48 @@ class StatusController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Status $status
+     * @param  \App\Office  $office
      * @return \Illuminate\Http\Response
      */
-    public function show(Status $status)
+    public function show(Office $office)
     {
         return response()->json([
             'status' => true,
-            'data' => new StatusResource($status)
+            'data'   => new OfficeResource($office)
         ], 200);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  App\Http\Request\StatusRequest   $request
-     * @param  App\Status  $status
+     * @param  App\Http\Requests\OfficeRequest  $request
+     * @param  \App\Office  $office
      * @return \Illuminate\Http\Response
      */
-    public function update(StatusRequest $request, Status $status)
+    public function update(OfficeRequest $request, Office $office)
     {
-        $status->name = $request->name;
-        $status->save();
+        $office->name           = $request->name;
+        $office->street_address = $request->street_address;
+        $office->city           = $request->city;
+        $office->state          = $request->state;
+        $office->country        = $request->country;
+        $office->save();
 
         return response()->json([
             'status' => true,
-            'data' => $status
+            'data' => $office
         ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Status  $status
+     * @param  \App\Office  $office
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Status $status)
+    public function destroy(Office $office)
     {
-        $status->delete();
+        $office->delete();
 
         return response()->json([
             'status' => true,
