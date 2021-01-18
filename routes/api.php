@@ -21,4 +21,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::group([], function() {
     Route::resource('/status', StatusController::class)->except(['edit','create']);
     Route::resource('/specialization', SpecializationController::class)->except(['edit','create']);
+    Route::resource('/client', ClientController::class)->except(['edit','create']);
 });
