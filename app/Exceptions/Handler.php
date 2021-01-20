@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
@@ -50,17 +51,25 @@ class Handler extends ExceptionHandler
     {
         $path = $request->getPathInfo();
         $return = ['status' => false, 'message' => $exception->getMessage()];
+        $code = is_callable([$exception,'getStatusCode']) ? $exception->getStatusCode() : $exception->getCode();
+
         if (strrpos($path,'/api/') !== false) {
             if ($exception instanceof ValidationException) {
 
                 $errorBag = $exception->validator->getMessageBag();
 
                 $return['validation'] = $errorBag;
-
-                return response()->json($return,400);
             }
 
-            return response()->json($return,400);
+            if ($exception instanceof QueryException) {
+                $return['message'] = 'A error was founded in query execution. Please contact a administrator. Reason: '.$exception->getMessage();
+            }
+
+            if ($code == 404) {
+                $return['message'] = "The resource excepted was not found: [{$path}] ";
+            }
+
+            return response()->json($return,($code == 404 ? $code:400));
         }
 
         return parent::render($request, $exception);

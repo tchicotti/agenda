@@ -23,4 +23,6 @@ Route::group([], function() {
     Route::resource('/specialization', SpecializationController::class)->except(['edit','create']);
     Route::resource('/client', ClientController::class)->except(['edit','create']);
     Route::resource('/office', OfficeController::class)->except(['edit','create']);
+    Route::resource('/doctor', DoctorController::class)->except(['edit','create']);
+    Route::resource('/appointment', AppointmentController::class)->except(['edit','create']);
 });
