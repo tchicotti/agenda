@@ -18,6 +18,21 @@ class Kernel extends ConsoleKernel
     ];
 
     /**
+     * Adding some custom middlewares to be called in routes
+     * @var array
+     */
+    protected $routeMiddleware = [
+        'jwt.auth' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
+        'jwt.refresh' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class,
+    ];
+
+    /**
+     * Adding some custom middlewares to be called
+     * @var array
+     */
+    protected $middleware = [ Barryvdh\Cors\HandleCors::class ];
+
+    /**
      * Define the application's command schedule.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule

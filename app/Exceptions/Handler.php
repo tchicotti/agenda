@@ -7,6 +7,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -53,6 +54,8 @@ class Handler extends ExceptionHandler
         $return = ['status' => false, 'message' => $exception->getMessage()];
         $code = is_callable([$exception,'getStatusCode']) ? $exception->getStatusCode() : $exception->getCode();
 
+        // dd($exception);
+
         if (strrpos($path,'/api/') !== false) {
             if ($exception instanceof ValidationException) {
 
@@ -67,6 +70,20 @@ class Handler extends ExceptionHandler
 
             if ($code == 404) {
                 $return['message'] = "The resource excepted was not found: [{$path}] ";
+            }
+
+            if ($exception instanceof UnauthorizedHttpException) {
+                $preException = $exception->getPrevious();
+                if ($preException instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
+                    $return['message'] = 'TOKEN_EXPIRED';
+                } else if ($preException instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
+                    $return['message'] = 'TOKEN_INVALID';
+                } else if ($preException instanceof \Tymon\JWTAuth\Exceptions\TokenBlacklistedException) {
+                     $return['message'] = 'TOKEN_BLACKLISTED';
+               }
+               if ($exception->getMessage() === 'Token not provided') {
+                   $return['message'] = 'Token not provided';
+               }
             }
 
             return response()->json($return,($code == 404 ? $code:400));

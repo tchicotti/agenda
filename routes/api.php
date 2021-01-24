@@ -13,12 +13,21 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+
+Route::group([ 'prefix' => 'auth' ], function ($router) {
+
+    Route::post('login', 'ApiController@login')->name('auth.login');
+    Route::post('register', 'ApiController@register')->name('auth.register');
+    Route::post('refresh', 'ApiController@refresh')->name('auth.refresh');
+
 });
 
+Route::group([ 'prefix' => 'auth', 'middleware' => 'auth:api' ], function ($router) {
+    Route::post('logout', 'ApiController@logout')->name('auth.logout');
+    Route::post('me', 'ApiController@me')->name('auth.me');
+});
 
-Route::group([], function() {
+Route::middleware(['jwt.auth'])->group(function() {
     Route::resource('/status', StatusController::class)->except(['edit','create']);
     Route::resource('/specialization', SpecializationController::class)->except(['edit','create']);
     Route::resource('/client', ClientController::class)->except(['edit','create']);
